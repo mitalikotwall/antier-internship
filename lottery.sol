@@ -1,19 +1,17 @@
-pragma solidity >=0.8.21;
+
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.22;
 
 contract Lottery {
-    struct Ticket {
-        string name;
-        uint ticketNumber;
-    }
+    mapping(uint256 => address) public tickets;
+    mapping(address => uint256) public userTickets;
+    event TicketPurchased(address indexed buyer, uint256 ticketNumber);
+    function buyTicket(uint256 ticketNumber) public {
+        require(userTickets[msg.sender] == 0, "You have already purchased a ticket.");
+        require(tickets[ticketNumber] == address(0), "Ticket number already taken.");
+        userTickets[msg.sender] = ticketNumber;
+        tickets[ticketNumber] = msg.sender;
 
-    mapping(uint => Ticket) public tickets;
-
-    function buyTicket(string memory name, uint ticketNumber) public returns (bool) {
-        if (tickets[ticketNumber].ticketNumber != 0) {
-            return false;
-        }
-
-        tickets[ticketNumber] = Ticket(name, ticketNumber);
-        return true;
+        emit TicketPurchased(msg.sender, ticketNumber);
     }
 }
